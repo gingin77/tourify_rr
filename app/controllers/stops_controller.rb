@@ -7,7 +7,7 @@ class StopsController < ApplicationController
       if permitted_tour? && organization_member?
         @stop = Stop.new
       else
-        redirect_to organization_path(@current_admin.organization_id), notice: "You are not authorized to view, add, or edit content for another organization."
+        redirect_to organization_path(@current_user.organization_id), notice: "You are not authorized to view, add, or edit content for another organization."
       end
     else
       redirect_to new_session_path
@@ -24,7 +24,7 @@ class StopsController < ApplicationController
           format.xls { send_data @tour.stops.to_csv(col_sep: "\t") }
         end
       else
-        redirect_to organization_path(@current_admin.organization_id), notice: "You are not authorized to view, add, or edit content for another organization."
+        redirect_to organization_path(@current_user.organization_id), notice: "You are not authorized to view, add, or edit content for another organization."
       end
     else
       redirect_to new_session_path
@@ -36,7 +36,7 @@ class StopsController < ApplicationController
       if permitted_tour? && organization_member?
         render :action => 'show.html' and return
       else
-        redirect_to organization_path(@current_admin.organization_id), notice: "You are not authorized to view, add, or edit content for another organization." and return
+        redirect_to organization_path(@current_user.organization_id), notice: "You are not authorized to view, add, or edit content for another organization." and return
       end
     end
     render :action => 'show.json'
@@ -46,14 +46,14 @@ class StopsController < ApplicationController
     if logged_in?
       if permitted_tour? && organization_member?
         @stop = @tour.stops.build(stop_params)
-        @stop.admin = current_admin
+        @stop.user = current_user
         if @stop.save
           render 'show'
         else
           render 'new'
         end
       else
-        redirect_to organization_path(@current_admin.organization_id), notice: "You are not authorized to view, add, or edit content for another organization."
+        redirect_to organization_path(@current_user.organization_id), notice: "You are not authorized to view, add, or edit content for another organization."
       end
     else
       redirect_to new_session_path
@@ -66,7 +66,7 @@ class StopsController < ApplicationController
         Stop.import(params[:file], params[:tour_id])
         redirect_to organization_tour_stops_path, notice: "Data imported"
       else
-        redirect_to organization_path(@current_admin.organization_id), notice: "You are not authorized to view, add, or edit content for another organization."
+        redirect_to organization_path(@current_user.organization_id), notice: "You are not authorized to view, add, or edit content for another organization."
       end
     else
       redirect_to new_session_path
@@ -76,13 +76,13 @@ class StopsController < ApplicationController
   def edit
     if logged_in?
       if permitted_tour? && organization_member?
-        if current_admin == @stop.admin
+        if current_user == @stop.user
           render :action => 'edit.html'
         else
-          redirect_to organization_tour_stop_path(@current_admin.organization_id, @tour.id, @stop.stop_num), notice: "You are not authorized to edit this stop."
+          redirect_to organization_tour_stop_path(@current_user.organization_id, @tour.id, @stop.stop_num), notice: "You are not authorized to edit this stop."
         end
       else
-        redirect_to organization_path(@current_admin.organization_id), notice: "You are not authorized to view or edit content belonging to another organization."
+        redirect_to organization_path(@current_user.organization_id), notice: "You are not authorized to view or edit content belonging to another organization."
       end
     else
       redirect_to new_session_path
@@ -97,7 +97,7 @@ class StopsController < ApplicationController
   def update
     if logged_in?
       if permitted_tour? && organization_member?
-        if current_admin == @stop.admin
+        if current_user == @stop.user
           @stop.update!(stop_params)
           redirect_to organization_tour_stop_path
         else
@@ -105,7 +105,7 @@ class StopsController < ApplicationController
           render 'edit'
         end
       else
-        redirect_to organization_path(@current_admin.organization_id), notice: "You are not authorized to view, add, or edit content for another organization."
+        redirect_to organization_path(@current_user.organization_id), notice: "You are not authorized to view, add, or edit content for another organization."
       end
     else
       redirect_to new_session_path
@@ -115,7 +115,7 @@ class StopsController < ApplicationController
   def destroy
     if logged_in?
       if permitted_tour? && organization_member?
-        if current_admin == @stop.admin
+        if current_user == @stop.user
           @stop.destroy
           flash[:notice] = 'The stop was successfully deleted.'
           redirect_to organization_tour_stops_path
@@ -124,7 +124,7 @@ class StopsController < ApplicationController
           render 'show'
         end
       else
-        redirect_to organization_path(@current_admin.organization_id), notice: "You are not authorized to view, add, or edit content for another organization."
+        redirect_to organization_path(@current_user.organization_id), notice: "You are not authorized to view, add, or edit content for another organization."
       end
     else
       redirect_to new_session_path
@@ -135,7 +135,7 @@ class StopsController < ApplicationController
     @stops = @tour.stops
     if logged_in?
       if permitted_tour? && organization_member?
-        if current_admin == @tour.admin
+        if current_user == @tour.user
           @stops.destroy_all
           flash[:notice] = 'Stops were successfully deleted.'
           redirect_to organization_tour_stops_path
@@ -143,7 +143,7 @@ class StopsController < ApplicationController
           flash[:notice] = 'You are not authorized to delete these stops.'
         end
       else
-        redirect_to organization_path(@current_admin.organization_id), notice: "You are not authorized to view, add, or edit content for another organization."
+        redirect_to organization_path(@current_user.organization_id), notice: "You are not authorized to view, add, or edit content for another organization."
       end
     else
       redirect_to new_session_path
@@ -173,14 +173,14 @@ class StopsController < ApplicationController
 
   def organization_member?
     @organization = Organization.find(params[:organization_id])
-    if @organization.id === @current_admin.organization_id
+    if @organization.id === @current_user.organization_id
       return true
     end
   end
 
   def permitted_tour?
     @tour = Tour.find(params[:tour_id])
-    allowed_org_id = @current_admin.organization_id
+    allowed_org_id = @current_user.organization_id
     allowed_tours = Tour.where organization_id: allowed_org_id
     allowed_tours.include? @tour
   end

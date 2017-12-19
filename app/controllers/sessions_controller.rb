@@ -1,15 +1,15 @@
 class SessionsController < ApplicationController
 
   def new
-    @admin = Admin.new
+    @user = User.new
   end
 
   def create
-    admin = Admin.find_by(username: params[:username])
-    if admin
-      organization = admin.organization
-      if admin.authenticate(params[:password])
-        session[:admin_id] = admin.id
+    user = User.find_by(username: params[:username])
+    if user
+      organization = user.organization
+      if user.authenticate(params[:password])
+        session[:user_id] = user.id
         redirect_to organization
       else
         flash[:alert] = 'Username or password is invalid'
@@ -22,7 +22,7 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    session[:admin_id] = nil
+    session[:user_id] = nil
     flash[:notice] = 'You have successfully logged out.'
     redirect_to new_session_path
   end

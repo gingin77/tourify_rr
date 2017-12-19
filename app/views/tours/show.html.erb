@@ -25,7 +25,7 @@
       <%= @tour.time_in_mins %>
       minutes</li>
     <li>Created By:
-      <%= @tour.admin.username %></li>
+      <%= @tour.user.username %></li>
     <li id="list_link">
       <div class="top_link">
         <%= link_to 'Edit tour overview', edit_organization_tour_path(@organization.id, @tour.id) %>

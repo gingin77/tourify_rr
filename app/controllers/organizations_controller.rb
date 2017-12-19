@@ -6,8 +6,8 @@ class OrganizationsController < ApplicationController
   end
 
   def index
-    set_organization
-    redirect_to organization_path(@organization.id) unless tourify_owner?
+    # set_organization
+    # redirect_to organization_path(@organization.id) unless tourify_owner?
     @organizations = Organization.all
     respond_to do |format|
       format.html
@@ -22,7 +22,7 @@ class OrganizationsController < ApplicationController
       if organization_member?
         render :action => 'show.html' and return
       else
-        redirect_to organization_path(@current_admin.organization_id), notice: "You are not authorized to view, add, or edit content for another organization." and return
+        redirect_to organization_path(@current_user.organization_id), notice: "You are not authorized to view, add, or edit content for another organization." and return
       end
     end
     render :action => 'show.json'
@@ -74,7 +74,7 @@ class OrganizationsController < ApplicationController
 
   def organization_member?
     @organization = Organization.find(params[:id])
-    if @organization.id === @current_admin.organization_id
+    if @organization.id === @current_user.organization_id
       return true
     end
   end
