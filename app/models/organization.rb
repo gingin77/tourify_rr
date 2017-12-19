@@ -1,5 +1,5 @@
 class Organization < ApplicationRecord
-  has_many :admins, dependent: :destroy
+  has_many :users, dependent: :destroy
   has_many :tours, dependent: :destroy
 
   validates_presence_of :name

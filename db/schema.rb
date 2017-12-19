@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171021154557) do
+ActiveRecord::Schema.define(version: 20171219192103) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -20,8 +20,6 @@ ActiveRecord::Schema.define(version: 20171021154557) do
     t.string "password_digest", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "organization_id"
-    t.index ["organization_id"], name: "index_admins_on_organization_id"
   end
 
   create_table "organizations", force: :cascade do |t|
@@ -52,11 +50,9 @@ ActiveRecord::Schema.define(version: 20171021154557) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "tour_id"
-    t.bigint "admin_id"
-    t.string "image"
-    t.string "attachments", default: [], array: true
-    t.index ["admin_id"], name: "index_stops_on_admin_id"
+    t.bigint "user_id"
     t.index ["tour_id"], name: "index_stops_on_tour_id"
+    t.index ["user_id"], name: "index_stops_on_user_id"
   end
 
   create_table "tours", force: :cascade do |t|
@@ -68,14 +64,23 @@ ActiveRecord::Schema.define(version: 20171021154557) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "organization_id"
-    t.bigint "admin_id"
-    t.index ["admin_id"], name: "index_tours_on_admin_id"
+    t.bigint "user_id"
     t.index ["organization_id"], name: "index_tours_on_organization_id"
+    t.index ["user_id"], name: "index_tours_on_user_id"
   end
 
-  add_foreign_key "admins", "organizations"
-  add_foreign_key "stops", "admins"
+  create_table "users", force: :cascade do |t|
+    t.string "username", null: false
+    t.string "password_digest", null: false
+    t.bigint "organization_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["organization_id"], name: "index_users_on_organization_id"
+  end
+
   add_foreign_key "stops", "tours"
-  add_foreign_key "tours", "admins"
+  add_foreign_key "stops", "users"
   add_foreign_key "tours", "organizations"
+  add_foreign_key "tours", "users"
+  add_foreign_key "users", "organizations"
 end

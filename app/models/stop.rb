@@ -1,6 +1,6 @@
 class Stop < ApplicationRecord
   belongs_to :tour
-  belongs_to :admin
+  belongs_to :user
 
   validates_presence_of :stop_num
   validates_uniqueness_of :stop_num, scope: [:tour_id]
