@@ -30,7 +30,7 @@ class AdminsController < ApplicationController
   end
 
   def update
-    if @admin == current_admin
+    if @admin == current_user
       @admin.update!(admin_params)
       if @admin.save
         redirect_to @organization, status: :accepted
@@ -43,7 +43,7 @@ class AdminsController < ApplicationController
   end
 
   def destroy
-    if @admin == current_admin
+    if @admin == current_user
       @admin.destroy
       flash[:notice] = 'Admin account deleted from Organization.'
       redirect_to @organization

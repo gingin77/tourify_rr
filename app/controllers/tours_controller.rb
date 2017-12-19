@@ -7,7 +7,7 @@ class ToursController < ApplicationController
       if
         @tour = Tour.new
       else
-        redirect_to organization_path(@current_admin.organization_id), notice: "You are not authorized to add content for another organization."
+        redirect_to organization_path(@current_user.organization_id), notice: "You are not authorized to add content for another organization."
       end
     else
       redirect_to new_session_path
@@ -17,9 +17,9 @@ class ToursController < ApplicationController
   def index
     if logged_in?
       if organization_member?
-        redirect_to current_admin.organization
+        redirect_to current_user.organization
       else
-        redirect_to organization_path(@current_admin.organization_id), notice: "You are not authorized to add content for another organization."
+        redirect_to organization_path(@current_user.organization_id), notice: "You are not authorized to add content for another organization."
       end
     else
       flash[:alert] = 'Please login to continue.'
@@ -32,7 +32,7 @@ class ToursController < ApplicationController
       if permitted_tour? && organization_member?
         render :action => 'show.html' and return
       else
-        redirect_to organization_path(@current_admin.organization_id), notice: "You are not authorized to view, add, or edit content for another organization." and return
+        redirect_to organization_path(@current_user.organization_id), notice: "You are not authorized to view, add, or edit content for another organization." and return
       end
     end
     render :action => 'show.json'
@@ -42,14 +42,14 @@ class ToursController < ApplicationController
     if logged_in?
       if organization_member?
         @tour = @organization.tours.build(tour_params)
-        @tour.admin = current_admin
+        @tour.admin = current_user
         if @tour.save
           redirect_to organization_path(@organization)
         else
           render 'new'
         end
       else
-        redirect_to organization_path(@current_admin.organization_id), notice: "You are not authorized to create content for another organization."
+        redirect_to organization_path(@current_user.organization_id), notice: "You are not authorized to create content for another organization."
       end
     else
       redirect_to new_session_path
@@ -61,7 +61,7 @@ class ToursController < ApplicationController
       if permitted_tour? && organization_member?
         render :action => 'edit.html'
       else
-        redirect_to organization_tour_path(@current_admin.organization_id, @tour.id), notice: "You are not authorized to view or edit content belonging to another organization."
+        redirect_to organization_tour_path(@current_user.organization_id, @tour.id), notice: "You are not authorized to view or edit content belonging to another organization."
       end
     else
       redirect_to new_session_path
@@ -78,7 +78,7 @@ class ToursController < ApplicationController
           render 'edit'
         end
       else
-        redirect_to organization_tour_path(@current_admin.organization_id, @tour.id), notice: "You are not authorized to view or edit content belonging to another organization."
+        redirect_to organization_tour_path(@current_user.organization_id, @tour.id), notice: "You are not authorized to view or edit content belonging to another organization."
       end
     else
       flash[:notice] = 'You do not have authorization to edit this tour.'
@@ -93,7 +93,7 @@ class ToursController < ApplicationController
         flash[:notice] = 'Tour was successfully deleted.'
         redirect_to @organization
       else
-        redirect_to organization_tour_path(@current_admin.organization_id, @tour.id), notice: "You are not authorized to view or edit content belonging to another organization."
+        redirect_to organization_tour_path(@current_user.organization_id, @tour.id), notice: "You are not authorized to view or edit content belonging to another organization."
       end
     else
       flash[:notice] = 'You are not authorized to delete this Tour.'
@@ -118,14 +118,14 @@ class ToursController < ApplicationController
 
   def organization_member?
     @organization = Organization.find(params[:organization_id])
-    if @organization.id === @current_admin.organization_id
+    if @organization.id === @current_user.organization_id
       return true
     end
   end
 
   def permitted_tour?
     @tour = Tour.find(params[:id])
-    allowed_org_id = @current_admin.organization_id
+    allowed_org_id = @current_user.organization_id
     allowed_tours = Tour.where organization_id: allowed_org_id
     allowed_tours.include? @tour
   end

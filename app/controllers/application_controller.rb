@@ -7,17 +7,17 @@ class ApplicationController < ActionController::Base
     session[:admin_id] = admin.id
   end
 
-  def current_admin
-    @current_admin ||= Admin.find_by(id: session[:admin_id])
+  def current_user
+    @current_user ||= Admin.find_by(id: session[:admin_id])
   end
 
   def logged_in?
-    !current_admin.nil?
+    !current_user.nil?
   end
 
   def tourify_owner?
-    current_admin
-    if (@current_admin.organization_id === 2)
+    current_user
+    if (@current_user.organization_id === 2)
       return true
     end
   end

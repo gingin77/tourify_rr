@@ -2,7 +2,7 @@
   <br />
   <h1>Organization: <%=@organization.name%></h1>
 
-  <% if @current_admin.organization_id != 2 %>
+  <% if @current_user.organization_id != 2 %>
   <% else %>
   <div class="top_link_box">
     <div class="top_link">

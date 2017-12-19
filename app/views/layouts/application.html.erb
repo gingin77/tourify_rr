@@ -13,14 +13,14 @@
     <nav>
       <div class="nav_logo_div">
       <img src = "https://durhamdill.files.wordpress.com/2017/10/tourify-logo-glow-200px2.png" alt = "tourify logo">
-      <% if @current_admin.blank? %>
+      <% if @current_user.blank? %>
       <% else %>
-      <span>Welcome, <%= @current_admin.username %></p>
+      <span>Welcome, <%= @current_user.username %></p>
       <% end %>
     </div>
     <div  id="logout_div">
       <h2>Content Creator Dashboard </h2>
-      <% if @current_admin.blank? %>
+      <% if @current_user.blank? %>
       <% else %>
       <div class="top_link", id="logout">
 

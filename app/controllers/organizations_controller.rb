@@ -22,7 +22,7 @@ class OrganizationsController < ApplicationController
       if organization_member?
         render :action => 'show.html' and return
       else
-        redirect_to organization_path(@current_admin.organization_id), notice: "You are not authorized to view, add, or edit content for another organization." and return
+        redirect_to organization_path(@current_user.organization_id), notice: "You are not authorized to view, add, or edit content for another organization." and return
       end
     end
     render :action => 'show.json'
@@ -30,7 +30,7 @@ class OrganizationsController < ApplicationController
 
   # def update
   #   @organization = Organization.find(params[:id])
-  #   if logged_in? && current_admin.organization == @organization
+  #   if logged_in? && current_user.organization == @organization
   #     @organization.update!(organization_params)
   #     if @organization.save
   #       flash[:notice] = 'Organization information sucessfully updated'
@@ -39,7 +39,7 @@ class OrganizationsController < ApplicationController
   #       render :edit
   #     end
   #   elsif logged_in?
-  #     redirect_to current_admin.organization
+  #     redirect_to current_user.organization
   #   else
   #     redirect_to new_session_path
   #   end
@@ -52,7 +52,7 @@ class OrganizationsController < ApplicationController
   #
   # def destroy
   #   @organization = Organization.find(params[:id])
-  #   if logged_in? && current_admin.organization == @organization
+  #   if logged_in? && current_user.organization == @organization
   #     @organization.destroy
   #     flash[:notice] = 'Organization successfully deleted.'
   #     redirect_to '/'
@@ -74,7 +74,7 @@ class OrganizationsController < ApplicationController
 
   def organization_member?
     @organization = Organization.find(params[:id])
-    if @organization.id === @current_admin.organization_id
+    if @organization.id === @current_user.organization_id
       return true
     end
   end
